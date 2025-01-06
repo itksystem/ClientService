@@ -42,6 +42,30 @@ exports.getProfile = async (req, res) => {
     }
 };
 
+
+
+/*
+ @input req/req - 
+ @output profile
+   200 - создан
+   400 - оршибка данных
+   422 - ошибка процесса
+   500 - серверная ошибка
+*/
+
+exports.getProfileById = async (req, res) => {          
+    try {
+        let userId = await authMiddleware.getUserId(req, res);
+        if(!userId) throw(422)     
+        let clientId = req.params.clientId;      
+        let profile = await clientHelper.profileFindById(clientId);
+        if(!profile) profile = {};
+        sendResponse(res, 200, { status: true,  profile });
+       } catch (error) {
+        sendResponse(res, (Number(error) || 500), { code: (Number(error) || 500), message:  new CommonFunctionHelper().getDescriptionByCode((Number(error) || 500)) });
+    }
+};
+
 /*
  @input body - параметры клиента
  @output result
