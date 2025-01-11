@@ -32,11 +32,12 @@ exports.getProfile = async (req, res) => {
     try {
         let userId = await authMiddleware.getUserId(req, res);
         if(!userId) throw(422)     
-        let  profile = await clientHelper.profileFindById(userId);
+        let profile = await clientHelper.profileFindById(userId);
         if(!profile) profile = {};
         let me = await authClient.me(req, res);        
         profile.login = (me?.data?.login) ? me?.data.login : undefined;
-         sendResponse(res, 200, { status: true,  profile });
+        profile.confirmed = me?.data?.confirmed || undefined;
+        sendResponse(res, 200, { status: true,  profile });
        } catch (error) {
         sendResponse(res, (Number(error) || 500), { code: (Number(error) || 500), message:  new CommonFunctionHelper().getDescriptionByCode((Number(error) || 500)) });
     }

@@ -1,7 +1,5 @@
-const amqp = require('amqplib');
 const db = require('openfsm-database-connection-producer');
-const { v4: uuidv4 } = require('uuid'); // Убедитесь, что установлен uuid версии 8
-const authMiddleware = require('openfsm-middlewares-auth-service');
+const ProfileDto = require('../models/ProfileDto');
 require('dotenv').config();
 
    /* найти по id пользователя */
@@ -10,7 +8,7 @@ require('dotenv').config();
       db.query('SELECT * FROM profile  WHERE user_id = ?', [userId], (err, result) => {
         (err)
         ? reject(err)
-        : resolve((result[0] != undefined ? result[0]: null));
+        : resolve(result[0] != undefined ? new ProfileDto(result[0]): null);
       });
     });
   };

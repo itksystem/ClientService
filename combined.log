@@ -7,3 +7,5 @@
 {"code":500,"level":"error","message":"Внутренняя ошибка сервера.","service":"pickapp-service","timestamp":"2024-11-24T18:55:42.215Z"}
 {"code":500,"level":"error","message":"Внутренняя ошибка сервера.","service":"pickapp-service","timestamp":"2024-11-24T18:55:44.572Z"}
 {"code":500,"level":"error","message":"Внутренняя ошибка сервера.","service":"pickapp-service","timestamp":"2024-12-03T18:21:31.098Z"}
+{"code":500,"level":"error","message":"Внутренняя ошибка сервера.","service":"pickapp-service","timestamp":"2025-01-06T21:02:58.456Z"}
+{"code":500,"level":"error","message":"Внутренняя ошибка сервера.","service":"pickapp-service","timestamp":"2025-01-11T19:48:58.058Z"}
