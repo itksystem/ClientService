@@ -30,8 +30,8 @@ const sendResponse = (res, statusCode, data) => {
 
 exports.getProfile = async (req, res) => {          
     try {
-        let userId = await authMiddleware.getUserId(req, res);
-        if(!userId) throw(422)     
+        let userId = await authClient.getUserId(req, res);
+        if(!userId) throw(401)     
         let profile = await clientHelper.profileFindById(userId);
         if(!profile) profile = {};
         let me = await authClient.me(req, res);        
@@ -56,7 +56,7 @@ exports.getProfile = async (req, res) => {
 
 exports.getProfileById = async (req, res) => {          
     try {
-        let userId = await authMiddleware.getUserId(req, res);
+        let userId = await authClient.getUserId(req, res);
         if(!userId) throw(422)     
         let clientId = req.params.clientId;      
         let profile = await clientHelper.profileFindById(clientId);
