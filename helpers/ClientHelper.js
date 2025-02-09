@@ -40,7 +40,35 @@ require('dotenv').config();
         resolve(result); // Предполагается, что поле isConfirmed
       });
     });  
-   return (result ? true : false)
-
-    
+   return (result ? true : false)   
   };
+
+     /* найти подписки пользователя */
+     exports.getSubcriptions = async (userId) => {
+      const result = await new Promise((resolve, reject) => {
+        db.query(SQL.CLIENT.FIND_SUBSCRIPTIONS_BY_USER_ID, [userId], (err, result) => {
+          if (err) {
+            logger.error(err);
+            return reject(err);
+          }
+          resolve(result); // Предполагается, что поле isConfirmed
+        });
+      });  
+     return (result?.rows ? result?.rows: null)   
+    };
+  
+    /* удалить/установить подписку пользователя */
+    exports.updateSubcription = async (userId, subscriptionId, status) => {
+      const result = await new Promise((resolve, reject) => {
+        db.query(SQL.CLIENT.UPDATE_SUBSCRIPTION_BY_USER_ID, [userId, subscriptionId, status], (err, result) => {
+          if (err) {
+            logger.error(err);
+            return reject(err);
+          }
+          resolve(result); // Предполагается, что поле isConfirmed
+        });
+      });  
+     return (result?.rows ? result?.rows[0].subscription_id: null)   
+    };
+  
+    

@@ -91,4 +91,35 @@ exports.saveProfile = async (req, res) => {
 };
 
 
+exports.getSubcriptions = async (req, res) => {          
+    try {
+        let userId = await authMiddleware.getUserId(req, res);
+        if(!userId) throw(422)        
+        const subcriptions = await clientHelper.getSubcriptions(userId);
+        if(!subcriptions) throw(500)        
+        sendResponse(res, 200, { status: true,  subcriptions });
+       } catch (error) {
+        sendResponse(res, (Number(error) || 500), { code: (Number(error) || 500), message:  new CommonFunctionHelper().getDescriptionByCode((Number(error) || 500)) });
+    }
+};
+
+
+
+exports.updateSubcription = async (req, res) => {          
+    try {
+        let userId = await authMiddleware.getUserId(req, res);
+        if(!userId) throw(422)
+        const {subscriptionId, status } = req.body;
+        const result = await clientHelper.updateSubcription(userId, subscriptionId, status);
+        if(!result) throw(500)        
+        sendResponse(res, 200, { status: true,  subscriptionId });
+       } catch (error) {
+        sendResponse(res, (Number(error) || 500), { code: (Number(error) || 500), message:  new CommonFunctionHelper().getDescriptionByCode((Number(error) || 500)) });
+    }
+};
+
+
+
+
+
 

@@ -46,7 +46,7 @@ exports.getSuggestAddress = async (req, res) => {
             }
         );
 
-        const suggestions = response.data.suggestions      
+        const suggestions = response?.data?.suggestions      
             .filter(item => [4, 5, 6, 7, 8, 9].includes(parseInt(item.data.fias_level)))
             .map(item => ({
                 value: item.value,
