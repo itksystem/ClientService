@@ -70,5 +70,34 @@ require('dotenv').config();
       });  
      return (result?.rows ? result?.rows[0].subscription_id: null)   
     };
-  
+
+
+// установить фото    file.fileId, file.url, userId, storage, bucket
+  exports.setProfileImage = async (mediaId, mediaKey, userId, storage, bucket) => {
+    const result = await new Promise((resolve, reject) => {
+      db.query(SQL.CLIENT.SET_PROFILE_IMAGE, [mediaId, mediaKey, userId, storage, bucket], (err, result) => {
+        if (err) {
+          logger.error(err);
+          return reject(err);
+        }
+        resolve(result); // Предполагается, что поле isConfirmed
+      });
+     });  
+    return (result ? true : false)
+  };
+
+// удалить фото
+  exports.deleteProfileImage = async (fileId, userId) => {
+    const result = await new Promise((resolve, reject) => {
+      db.query(SQL.CLIENT.DELETE_PROFILE_IMAGE,  [fileId, userId], (err, result) => {
+        if (err) {
+          logger.error(err);
+          return reject(err);
+        }
+        resolve(result); // Предполагается, что поле isConfirmed
+      });
+     });  
+    return (result ? true : false)
+  };
+
     

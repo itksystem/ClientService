@@ -52,7 +52,7 @@ exports.getSuggestAddress = async (req, res) => {
                 value: item.value,
                 fiasId: item.data.fias_id,
                 fiasLevel: item.data.fias_level,
-                address : {
+//                address : {
                 postalCode : item.data.postal_code,
                 country : item.data.country,
                 region : item.data.region,
@@ -61,7 +61,7 @@ exports.getSuggestAddress = async (req, res) => {
                 house : item.data.house,
                 block : item.data.block,
                 flat : item.data.flat
-              }         
+//              }         
         }));
 
         sendResponse(res, 200, { status: true,  data: suggestions });

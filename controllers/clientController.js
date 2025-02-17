@@ -95,9 +95,9 @@ exports.getSubcriptions = async (req, res) => {
     try {
         let userId = await authMiddleware.getUserId(req, res);
         if(!userId) throw(422)        
-        const subcriptions = await clientHelper.getSubcriptions(userId);
-        if(!subcriptions) throw(500)        
-        sendResponse(res, 200, { status: true,  subcriptions });
+        const subscriptions = await clientHelper.getSubcriptions(userId);
+        if(!subscriptions) throw(500)        
+        sendResponse(res, 200, { status: true,  subscriptions });
        } catch (error) {
         sendResponse(res, (Number(error) || 500), { code: (Number(error) || 500), message:  new CommonFunctionHelper().getDescriptionByCode((Number(error) || 500)) });
     }
@@ -107,6 +107,7 @@ exports.getSubcriptions = async (req, res) => {
 
 exports.updateSubcription = async (req, res) => {          
     try {
+        
         let userId = await authMiddleware.getUserId(req, res);
         if(!userId) throw(422)
         const {subscriptionId, status } = req.body;
@@ -118,6 +119,58 @@ exports.updateSubcription = async (req, res) => {
     }
 };
 
+exports.setProfileImage = async (req, res) => {          
+    try {
+        let userId = await authClient.getUserId(req, res);
+        if(!userId) {
+          logger.error(userId);
+ 	  throw(422);               
+	}
+        let {fileUrls}  = req.body;
+        let fileId = uuidv4();
+	// let reviewId = await clientHelper.setProfile(profileId, userId, review);
+        // сохраняем изображения
+        console.log(fileUrls);
+	if(fileUrls?.length > 0) 
+  	  await Promise.all( // Асинхронно загружаем медиафайлы для каждого продукта
+	    fileUrls.map(async(file) => {
+	        try { 
+		  console.log(file);
+          fileId = uuidv4();
+		  let storage  = 'pickmax.profiles';
+		  let bucket   = 'local';                
+	          let result = await clientHelper.setProfileImage(fileId, file, userId, storage, bucket)
+              if(!result) throw('Ошибка записи изображения в профиль')
+	        } catch (mediaError) { // Логируем ошибку загрузки медиафайлов, но продолжаем обработку других продуктов          
+	          logger.error(`Error fetching media for userId ${userId}: ${mediaError.message}`);
+	        }
+	      })	
+  	   );
+        sendResponse(res, 200, { status: true, fileId });	
+       } catch (error) {
+        console.log(error);
+        sendResponse(res, (Number(error) || 500), { code: (Number(error) || 500), message:  new CommonFunctionHelper().getDescriptionByCode((Number(error) || 500)) });
+    }
+};
+
+exports.deleteProfileImage = async (req, res) => {          
+    try {
+        let userId = await authClient.getUserId(req, res);
+        let fileId = req.params.fileId;
+        if(!userId || !fileId ) {
+	  console.error(fileId, userId); 
+          logger.error(fileId, userId); 
+ 	  throw(422);               
+	}
+        let result = await clientHelper.deleteProfileImage(fileId, userId);
+        if(!result) throw(403)
+        // сохраняем изображения
+        sendResponse(res, 200, { status: true });	
+       } catch (error) {
+        console.log(error);
+        sendResponse(res, (Number(error) || 500), { code: (Number(error) || 500), message:  new CommonFunctionHelper().getDescriptionByCode((Number(error) || 500)) });
+    }
+};
 
 
 
