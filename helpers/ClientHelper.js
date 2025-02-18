@@ -86,6 +86,21 @@ require('dotenv').config();
     return (result ? true : false)
   };
 
+// получить фото  
+  exports.getProfileImage = async (userId) => {
+    const result = await new Promise((resolve, reject) => {
+      db.query(SQL.CLIENT.GET_PROFILE_IMAGE, [userId], (err, result) => {
+        if (err) {
+          logger.error(err);
+          return reject(err);
+        }
+        resolve(result?.rows[0]); // Предполагается, что поле isConfirmed
+      });
+     });  
+    return (result)
+  };
+
+
 // удалить фото
   exports.deleteProfileImage = async (fileId, userId) => {
     const result = await new Promise((resolve, reject) => {

@@ -128,8 +128,6 @@ exports.setProfileImage = async (req, res) => {
 	}
         let {fileUrls}  = req.body;
         let fileId = uuidv4();
-	// let reviewId = await clientHelper.setProfile(profileId, userId, review);
-        // сохраняем изображения
         console.log(fileUrls);
 	if(fileUrls?.length > 0) 
   	  await Promise.all( // Асинхронно загружаем медиафайлы для каждого продукта
@@ -172,7 +170,17 @@ exports.deleteProfileImage = async (req, res) => {
     }
 };
 
-
-
-
-
+exports.getProfileImage = async (req, res) => {          
+    try {
+        let userId = await authClient.getUserId(req, res);
+        if(!userId) {
+          logger.error(userId);
+ 	  throw(422);               
+	}
+        const result = await clientHelper.getProfileImage(userId);
+        if(!result) throw(500)        
+        sendResponse(res, 200, { status: true,  url : result.media_key });
+       } catch (error) {
+        sendResponse(res, (Number(error) || 500), { code: (Number(error) || 500), message:  new CommonFunctionHelper().getDescriptionByCode((Number(error) || 500)) });
+    }
+};
