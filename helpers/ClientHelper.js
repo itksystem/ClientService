@@ -6,7 +6,7 @@ const MESSAGES        = require('common-client-service').MESSAGES;
 const LANGUAGE = 'RU';
 
 
-require('dotenv').config();
+require('dotenv').config({ path: '.env-client-service' });
 
    /* найти по id пользователя */
    exports.profileFindById = async (userId) => {
