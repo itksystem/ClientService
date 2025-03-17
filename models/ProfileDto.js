@@ -1,20 +1,25 @@
 class ProfileDto {
-  constructor({ id, user_id, phone, surname, name, patronymic, address, created, updated, login }) {
-    this.profileId = id;
-    this.userId = user_id;
-    this.phone = phone;
-    this.surname = surname;
-    this.name = name;
-    this.patronymic = patronymic;
-    this.address = address;
-    this.created = created;
-    this.updated = updated;
-    this.login = login;
+  constructor({ id, user_id, phone, surname, name, patronymic, address, created, updated, login, email }) {
+    this.profileId = Number(id) ?? undefined;
+    this.userId =  Number(user_id) ?? undefined;
+    this.phone = phone ?? undefined;
+    this.surname = surname ?? undefined;
+    this.name = name ?? undefined;
+    this.patronymic = patronymic ?? undefined;
+    this.address = address ?? undefined;
+    this.created = created ?? undefined;
+    this.updated = updated ?? undefined;
+    this.login = login ?? undefined;
+    this.email = email ?? undefined;
   }
 
   // Геттеры
   getId() {
     return this.id;
+  }
+
+  getEmail() {
+    return this.email;
   }
 
   getUserId() {
@@ -55,11 +60,15 @@ class ProfileDto {
 
   // Сеттеры
   setId(value) {
-    this.id = value;
+    this.id = Number(value);
+  }
+
+  setEmail(value) {
+    this.email = value;
   }
 
   setUserId(value) {
-    this.userId = value;
+    this.userId = Number(value);
   }
 
   setPhone(value) {
@@ -106,7 +115,8 @@ class ProfileDto {
       address: '${this.address}',
       created: '${this.created}',
       updated: '${this.updated}',
-      login: '${this.login}'
+      login: '${this.login}',
+      email: '${this.email}'
     }`;
   }
 }
