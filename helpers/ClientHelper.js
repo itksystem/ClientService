@@ -160,6 +160,18 @@ exports.updateEmail = async (email, userId) => {
   return (result ? true : false)
 };
 
+// найти  Email
+exports.checkEmail = async (email, userId) => {
+  const result = await new Promise((resolve, reject) => {
+    db.query(SQL.CLIENT.CHECK_EMAIL,  [email, userId], (err, result) => {
+      if (err) {        
+        return reject(err);
+      }
+      resolve(result); // Предполагается, что поле isConfirmed
+    });
+   });  
+  return (result.rows)
+};
 
 // обновить telegramId
 exports.getUserIdByTelegramId = async (telegramId) => {

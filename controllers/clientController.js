@@ -93,12 +93,12 @@ exports.checkEmail= async (req, res) => {
         let userId = await authMiddleware.getUserId(req, res);
         if(!userId) throw(422)
         const { email } = req.body;
-        const result = await clientHelper.checkEmail( email, userId );
-        if(result) throw(409)  // зарегистрирован у другого пользователя
-        sendResponse(res, 200, { status: true });
-       } catch (error) {
-        console.log(error);
-        sendResponse(res, (Number(error) || 500), { code: (Number(error) || 500), message:  new CommonFunctionHelper().getDescriptionByCode((Number(error) || 500)) });
+        const result = await clientHelper.checkEmail( email, userId );        
+        if(Number(result?.length ?? 0) >= 1) throw(409)  // зарегистрирован у другого пользователя
+        sendResponse(res, 200, { status: true , message : "Проверка пройдена" });
+        } catch (error) {
+        console.log(error);        
+        sendResponse(res, 200, { status: false, message : "Email используется другим пользователем" });
     }
 };
 
@@ -199,11 +199,12 @@ exports.checkPhone= async (req, res) => {
         const { phone } = req.body;
         if(!userId || !phone) throw(422)        
         const result = await clientHelper.checkPhone( phone, userId );
-        if(result && result.length > 1) throw(409)  // зарегистрирован у другого пользователя
-        sendResponse(res, 200, { status: true });
+        console.log(Number(result?.length ?? 0) >= 1)
+        if(Number(result?.length ?? 0) >= 1) throw(409)  // зарегистрирован у другого пользователя
+        sendResponse(res, 200, { status: true , message : "Проверка пройдена" });
        } catch (error) {
-        console.log(error);
-        sendResponse(res, (Number(error) || 500), { code: (Number(error) || 500), message:  new CommonFunctionHelper().getDescriptionByCode((Number(error) || 500)) });
+        console.log(error);        
+        sendResponse(res, 200, { status: false, message : "Номер используется другим пользователем" });
     }
 };
 

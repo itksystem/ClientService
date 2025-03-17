@@ -12,7 +12,7 @@ const authMiddleware = require('openfsm-middlewares-auth-service');
 router.get('/v1/profile', authMiddleware.authenticateToken, getProfile);  // получить профиль
 router.post('/v1/profile', authMiddleware.authenticateToken, saveProfile);  // сохранить профиль
 
-router.get('/v1/email-check', authMiddleware.authenticateToken, checkEmail);  // сохранить в профиль email
+router.post('/v1/email-check', authMiddleware.authenticateToken, checkEmail);  // сохранить в профиль email
 router.post('/v1/email', authMiddleware.authenticateToken, saveEmail);  // сохранить в профиль email
 
 router.post('/v1/phone-check', authMiddleware.authenticateToken, checkPhone);  // проверить телефон перед записью
