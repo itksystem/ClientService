@@ -1,5 +1,5 @@
 class ProfileDto {
-  constructor({ id, user_id, phone, surname, name, patronymic, address, created, updated, login, email }) {
+  constructor({ id, user_id, phone, surname, name, patronymic, address, created, updated, login, email, email_confirmed_at, phone_confirmed_at }) {
     this.profileId = Number(id) ?? undefined;
     this.userId =  Number(user_id) ?? undefined;
     this.phone = phone ?? undefined;
