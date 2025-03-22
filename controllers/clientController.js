@@ -33,6 +33,12 @@ exports.getProfile = async (req, res) => {
         if(!userId) throw(401)     
         let profile = await clientHelper.profileFindById(userId);
         if(!profile) profile = {};
+        const _me = await authClient.me(req, res);
+        console.log(`getMe=>`, _me);
+        if (!_me) {
+          throw new Error('User _me not initialized');
+        }          
+        profile.isEmailConfirmed = _me.data.isEmailConfirmed || undefined;
         sendResponse(res, 200, { status: true,  profile });
        } catch (error) {
         console.log(error);
@@ -116,6 +122,8 @@ exports.saveEmail= async (req, res) => {
         sendResponse(res, (Number(error) || 500), { code: (Number(error) || 500), message:  new CommonFunctionHelper().getDescriptionByCode((Number(error) || 500)) });
     }
 };
+
+
 
 // telegramId
 exports.getUserIdByTelegramId= async (req, res) => {          

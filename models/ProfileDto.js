@@ -11,6 +11,8 @@ class ProfileDto {
     this.updated = updated ?? undefined;
     this.login = login ?? undefined;
     this.email = email ?? undefined;
+    this.emailConfirmedAt = email_confirmed_at ?? undefined;
+    this.phoneConfirmedAt = phone_confirmed_at ?? undefined;
   }
 
   // Геттеры
@@ -30,6 +32,12 @@ class ProfileDto {
     return this.phone;
   }
 
+  getPhoneConfirmedAt(){
+    return this.phoneConfirmedAt;
+  }
+  getEmailConfirmedAt(){
+    return this.emailConfirmedAt;
+  }
   getSurname() {
     return this.surname;
   }
@@ -75,6 +83,14 @@ class ProfileDto {
     this.phone = value;
   }
 
+  setPhoneConfirmedAt(value) {
+    this.phoneConfirmedAt = value;
+  }
+
+  setEmailConfirmedAt(value) {
+    this.emailConfirmedAt = value;
+  }
+
   setSurname(value) {
     this.surname = value;
   }
@@ -116,7 +132,9 @@ class ProfileDto {
       created: '${this.created}',
       updated: '${this.updated}',
       login: '${this.login}',
-      email: '${this.email}'
+      email: '${this.email}',
+      emailConfirmedAt: '${this.emailConfirmedAt}',      
+      phoneConfirmedAt: '${this.phoneConfirmedAt}'
     }`;
   }
 }
