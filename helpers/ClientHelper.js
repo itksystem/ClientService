@@ -5,6 +5,9 @@ const SQL        = require('common-client-service').SQL;
 const MESSAGES        = require('common-client-service').MESSAGES;
 const LANGUAGE = 'RU';
 
+const ClientProducerAMQP  =  require('openfsm-client-producer-amqp'); // ходим в почту через шину
+const amqp = require('amqplib');
+
 
 require('dotenv').config({ path: '.env-client-service' });
 
@@ -231,3 +234,82 @@ exports.updateProfileByTelegramId = async (telegramId, user) => {
    return null;
  }
 };
+
+//{"request_id":"afab9669-8ab0-4187-8c56-854a64f82d3b","user_id":"14","code":49793,"attempts":3,"status":"SUCCESS","created":"2025-03-26T17:18:03.672Z","updated":"2025-03-24T11:33:03.672Z","blocked":"2025-03-24T11:33:03.672Z","confirmation_type":"email","sended":"2025-03-24T15:49:27.489Z"}
+const { RABBITMQ_HOST, RABBITMQ_PORT, RABBITMQ_USER, RABBITMQ_PASSWORD,  RABBITMQ_SMS_CODES_RESULT_SUCCESS_CALLBACK_QUEUE  } = process.env;
+const login = RABBITMQ_USER || 'guest';
+const pwd = RABBITMQ_PASSWORD || 'guest';
+const host = RABBITMQ_HOST || 'rabbitmq-service';
+const port = RABBITMQ_PORT || '5672';
+
+const SMS_CODES_RESULT_SUCCESS_CALLBACK= RABBITMQ_SMS_CODES_RESULT_SUCCESS_CALLBACK_QUEUE  || 'SMS_CODES_RESULT_SUCCESS_CALLBACK';
+
+
+async function startConsumer(queue, handler) {
+  try {
+      const connection = await amqp.connect(`amqp://${login}:${pwd}@${host}:${port}`);
+      const channel = await connection.createChannel();
+      await channel.assertQueue(queue, { durable: true });
+      console.log(`Listening on queue ${queue}...`);
+      channel.consume(queue, async (msg) => {
+          if (msg) {
+              try {
+                  const data = JSON.parse(msg.content.toString());
+                  await handler(data);
+                  channel.ack(msg);
+              } catch (error) {
+                  console.error(`Error processing message: ${error}`);
+              }
+          }
+      });
+  } catch (error) {
+      console.error(`Error connecting to RabbitMQ: ${error}`);
+  }
+}
+
+async function emailConfirmUpdate(msg = null) { 
+  if(!msg) return null;
+  return new Promise((resolve, reject) => {  
+        db.query( SQL.CLIENT.UPDATE_PROFILE_EMAIL_CONFIRM,
+          [msg.user_id, msg.confirmation_type, msg.status],
+          (err, results) => {
+            if (err) {
+              console.log(err); 
+              return reject(null);
+            }
+            resolve(results.rows[0]);
+        }
+     );
+  });
+};
+
+async function phoneConfirmUpdate(msg = null) { 
+  if(!msg) return null;
+  return new Promise((resolve, reject) => {  
+        db.query( SQL.CLIENT.UPDATE_PROFILE_PHONE_CONFIRM,
+          [msg.user_id, msg.confirmation_type, msg.status],
+          (err, results) => {
+            if (err) {
+              console.log(err); 
+              return reject(null);
+            }
+            resolve(results.rows[0]);
+        }
+     );
+  });
+};
+
+// чтение результата отправки кода смс
+startConsumer(SMS_CODES_RESULT_SUCCESS_CALLBACK, async (msg) => { 
+  try {
+    console.log(msg);  
+    switch(msg.confirmation_type){
+      case 'email' : { await emailConfirmUpdate(msg); return; }
+      case 'phone' : { await phoneConfirmUpdate(msg); return; }
+
+    }    
+  } catch (error) {
+    console.log(error); 
+  }
+});
+
