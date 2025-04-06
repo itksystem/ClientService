@@ -5,9 +5,13 @@ const {
     getProfile, saveProfile, getProfileById, 
     getSubcriptions, updateSubcription, getProfileImage, 
     setProfileImage, deleteProfileImage, checkPhone, savePhone, checkEmail, saveEmail, getUserIdByEmail,
-    getUserIdByTelegramId, createProfileByTelegramId,updateProfileByTelegramId,getTelegramProfile
+    getUserIdByTelegramId, createProfileByTelegramId,updateProfileByTelegramId,getTelegramProfile,getClientRegions, saveClientRegion, deleteClientRegion
   } = require('../controllers/clientController');
 const authMiddleware = require('openfsm-middlewares-auth-service');
+
+router.get('/v1/regions', authMiddleware.authenticateToken, getClientRegions);  // получить список регионов
+router.post('/v1/region', authMiddleware.authenticateToken, saveClientRegion);  // сохранить регион
+router.delete('/v1/region', authMiddleware.authenticateToken, deleteClientRegion);  // удалить регион
 
 router.get('/v1/profile', authMiddleware.authenticateToken, getProfile);  // получить профиль
 router.post('/v1/profile', authMiddleware.authenticateToken, saveProfile);  // сохранить профиль

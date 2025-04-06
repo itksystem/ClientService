@@ -11,6 +11,47 @@ const amqp = require('amqplib');
 
 require('dotenv').config({ path: '.env-client-service' });
 
+   /* найти регионы по id пользователя */
+   exports.getClientRegions = async (userId) => {
+    const result = await new Promise((resolve, reject) => {
+     db.query(SQL.CLIENT.FIND_CLIENT_REGIONS_BY_USER_ID, [userId], (err, result) => {
+       if (err) {
+         return reject(err);
+       }
+       resolve(result); // Предполагается, что поле isConfirmed
+     });
+   });  
+  return (result.rows)
+ };
+
+ 
+    /* сохранить регион по fiasId и id пользователя */
+    exports.saveClientRegions = async (fiasId, reginName, userId) => {
+      const result = await new Promise((resolve, reject) => {
+       db.query(SQL.CLIENT.SAVE_CLIENT_REGIONS_BY_USER_ID, [fiasId, reginName, userId], (err, result) => {
+         if (err) {
+           return reject(err);
+         }
+         resolve(result); // Предполагается, что поле isConfirmed
+       });
+     });  
+    return (result.rows)
+   };
+  
+    /* удалить регион по fiasId и id пользователя */
+    exports.deleteClientRegions = async (fiasId, userId) => {
+      const result = await new Promise((resolve, reject) => {
+       db.query(SQL.CLIENT.SAVE_CLIENT_REGIONS_BY_USER_ID, [fiasId, userId], (err, result) => {
+         if (err) {
+           return reject(err);
+         }
+         resolve(result); // Предполагается, что поле isConfirmed
+       });
+     });  
+    return (result.rows)
+   };
+  
+
    /* найти по id пользователя */
    exports.profileFindById = async (userId) => {
      const result = await new Promise((resolve, reject) => {
@@ -165,11 +206,14 @@ exports.updateEmail = async (email, userId) => {
 
 // найти  Email
 exports.checkEmail = async (email, userId) => {
+  console.log(email, userId)
   const result = await new Promise((resolve, reject) => {
     db.query(SQL.CLIENT.CHECK_EMAIL,  [email, userId], (err, result) => {
       if (err) {        
+        console.log(err)
         return reject(err);
       }
+      console.log(result)
       resolve(result); // Предполагается, что поле isConfirmed
     });
    });  

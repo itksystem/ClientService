@@ -18,6 +18,48 @@ const sendResponse = (res, statusCode, data) => {
 };
 
 
+exports.getClientRegions = async (req, res) => {          
+    try {
+        let userId = await authClient.getUserId(req, res);
+        if(!userId) throw(401)     
+        let regions = await clientHelper.getClientRegions(userId);
+        if(!regions) regions = {};
+        sendResponse(res, 200, { status: true,  regions });
+       } catch (error) {
+        console.log(error);
+        sendResponse(res, (Number(error) || 500), { code: (Number(error) || 500), message:  new CommonFunctionHelper().getDescriptionByCode((Number(error) || 500)) });
+    }
+};
+
+
+exports.saveClientRegion = async (req, res) => {          
+    try {
+        let userId = await authClient.getUserId(req, res);        
+        const {fiasId, regionName} = req.body;  
+        if(!userId || !fiasId ||  !regionName) throw(401)     
+        let regions = await clientHelper.saveClientRegions(fiasId, regionName, userId);
+        if(!regions) regions = {};
+        sendResponse(res, 200, { status: true,  regions });
+       } catch (error) {
+        console.log(error);
+        sendResponse(res, (Number(error) || 500), { code: (Number(error) || 500), message:  new CommonFunctionHelper().getDescriptionByCode((Number(error) || 500)) });
+    }
+};
+
+exports.deleteClientRegion = async (req, res) => {          
+    try {
+        let userId = await authClient.getUserId(req, res);
+        if(!userId) throw(401)     
+        const {fiasId} = req.body;  
+        let regions = await clientHelper.deleteClientRegions(fiasId, userId);
+        if(!regions) regions = {};
+        sendResponse(res, 200, { status: true,  regions });
+       } catch (error) {
+        console.log(error);
+        sendResponse(res, (Number(error) || 500), { code: (Number(error) || 500), message:  new CommonFunctionHelper().getDescriptionByCode((Number(error) || 500)) });
+    }
+};
+
 /*
  @input req/req - 
  @output profile
@@ -89,11 +131,14 @@ exports.saveProfile = async (req, res) => {
 
 
 exports.checkEmail= async (req, res) => {          
-    try {
+    try {        
+        console.log(`checkEmail`);        
         let userId = await authMiddleware.getUserId(req, res);
+        console.log(userId);        
         if(!userId) throw(422)
         const { email } = req.body;
         const result = await clientHelper.checkEmail( email, userId );        
+        console.log(result);        
         if(Number(result?.length ?? 0) >= 1) throw(409)  // зарегистрирован у другого пользователя
         sendResponse(res, 200, { status: true , message : "Проверка пройдена" });
         } catch (error) {

@@ -8,7 +8,7 @@ app.use(bodyParser.json({ type: 'application/json' }));
 
 
 app.use(function(request, response, next){
-  // console.log(request);  
+  console.log(request);  
   next();
 });
 
