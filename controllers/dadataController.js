@@ -48,11 +48,11 @@ exports.getSuggestAddress = async (req, res) => {
 
         const suggestions = response?.data?.suggestions      
             .filter(item => [4, 5, 6, 7, 8, 9].includes(parseInt(item.data.fias_level)))
+            .slice(0, 5) // Ограничиваем вывод 5 элементами
             .map(item => ({
                 value: item.value,
                 fiasId: item.data.fias_id,
                 fiasLevel: item.data.fias_level,
-//                address : {
                 postalCode : item.data.postal_code,
                 country : item.data.country,
                 region : item.data.region,
@@ -61,7 +61,6 @@ exports.getSuggestAddress = async (req, res) => {
                 house : item.data.house,
                 block : item.data.block,
                 flat : item.data.flat
-//              }         
         }));
 
         sendResponse(res, 200, { status: true,  data: suggestions });
