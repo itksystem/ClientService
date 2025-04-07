@@ -41,7 +41,7 @@ require('dotenv').config({ path: '.env-client-service' });
     /* удалить регион по fiasId и id пользователя */
     exports.deleteClientRegions = async (fiasId, userId) => {
       const result = await new Promise((resolve, reject) => {
-       db.query(SQL.CLIENT.SAVE_CLIENT_REGIONS_BY_USER_ID, [fiasId, userId], (err, result) => {
+       db.query(SQL.CLIENT.DELETE_CLIENT_REGIONS_BY_USER_ID, [fiasId, userId], (err, result) => {
          if (err) {
            return reject(err);
          }

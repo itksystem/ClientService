@@ -36,7 +36,8 @@ exports.saveClientRegion = async (req, res) => {
     try {
         let userId = await authClient.getUserId(req, res);        
         const {fiasId, regionName} = req.body;  
-        if(!userId || !fiasId ||  !regionName) throw(401)     
+        if(!userId) throw(401)     
+        if(!fiasId ||  !regionName) throw(402)    
         let regions = await clientHelper.saveClientRegions(fiasId, regionName, userId);
         if(!regions) regions = {};
         sendResponse(res, 200, { status: true,  regions });
