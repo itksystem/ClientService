@@ -5,7 +5,7 @@ const {getSuggestAddress, getCdekFilials, getRussianPostUnits}  = require('../co
 const authMiddleware = require('openfsm-middlewares-auth-service');
 
 router.get('/v1/suggest/address', authMiddleware.authenticateToken, getSuggestAddress);  // получить профиль
-router.get('/v1/suggest/russian-postal-unit', authMiddleware.authenticateToken, getRussianPostUnits);  // получить список почтовый отделений России
+router.get('/v1/suggest/russian-postal-units', authMiddleware.authenticateToken, getRussianPostUnits);  // получить список почтовый отделений России
 router.get('/v1/suggest/cdek-filials', authMiddleware.authenticateToken, getCdekFilials);  // получить список филиалов CDEK
 
 module.exports = router;

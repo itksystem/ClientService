@@ -74,7 +74,7 @@ exports.getSuggestAddress = async (req, res) => {
 };
 
 
-/* Почтовые */
+/* Почтовые отделения */
 exports.getRussianPostUnits = async (req, res) => {          
     const query = req.query.query;
     // Проверка наличия query
@@ -98,9 +98,29 @@ exports.getRussianPostUnits = async (req, res) => {
             }
         );
 
-        const suggestions = response?.data?.suggestions;
-        sendResponse(res, 200, { status: true,  data: suggestions });
-        
+        const suggestions = response?.data?.suggestions
+        .slice(0, 5) // Ограничиваем вывод 5 элементами
+        .map(item => ({
+                   "value" : item.unrestricted_value,
+                   "postalСode": item.data.postal_code,
+                   "isClosed": item.data.is_closed,
+                   "typeCode": item.data.type_code,
+                   "addressStr": item.data.address_str,
+                   "kladrId": item.data.address_kladr_id,
+                   "qc": item.data.address_qc,
+                   "geoLat": item.data.geo_lat,
+                   "geoLon": item.data.geo_lon,
+                   "schedule" : {
+                   "Mon": item.data.schedule_mon ?? `не работает`,
+                   "Tue": item.data.schedule_tue ?? `не работает`,
+                   "Wed": item.data.schedule_wed ?? `не работает`,
+                   "Thu": item.data.schedule_thu ?? `не работает`,
+                   "Fri": item.data.schedule_fri ?? `не работает`,
+                   "Sat": item.data.schedule_sat ?? `не работает`,
+                   "Sun": item.data.schedule_sun ?? `не работает`
+                   }
+    }));
+        sendResponse(res, 200, { status: true,  data: suggestions })        
     } catch (error) {
         console.error("Error:", error.message);
         sendResponse(res, (Number(error) || 500), { code: (Number(error) || 500), message:  new CommonFunctionHelper().getDescriptionByCode((Number(error) || 500)) });
