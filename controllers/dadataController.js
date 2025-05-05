@@ -11,6 +11,11 @@ const axios = require('axios'); // Импорт библиотеки axios
 
 require('dotenv').config({ path: '.env-client-service' });
 
+const DADATA_API_KEY = process.env.DADATA_API_KEY || "bc9d9254dea2089592ccee5328f19ce9d004a43c"; // Используем переменные окружения
+const DADATA_SUGGEST_ADDRESS_URL = process.env.DADATA_SUGGEST_ADDRESS_URL || "http://suggestions.dadata.ru/suggestions/api/4_1/rs/suggest/address";
+const DADATA_RUSSIAN_POST_UNIT_URL = process.env.DADATA_RUSSIAN_POST_UNIT_URL || "http://suggestions.dadata.ru/suggestions/api/4_1/rs/suggest/postal_unit";
+const DADATA_CDEK_DELIVERY_UNIT_URL = process.env.DADATA_CDEK_DELIVERY_UNIT_URL || "http://suggestions.dadata.ru/suggestions/api/4_1/rs/findById/delivery";
+
 
 const sendResponse = (res, statusCode, data) => {
     if(statusCode >= 400)
@@ -31,17 +36,14 @@ exports.getSuggestAddress = async (req, res) => {
     }
 
     try {
-        const apiKey = process.env.DADATA_API_KEY || "bc9d9254dea2089592ccee5328f19ce9d004a43c"; // Используем переменные окружения
-        const url = process.env.DADATA_SUGGEST_ADDRESS_URL || "http://suggestions.dadata.ru/suggestions/api/4_1/rs/suggest/address";
-
         const response = await axios.post(
-            url,
+            DADATA_SUGGEST_ADDRESS_URL,
             { query }, // Тело запроса
                 {
                     headers: {
                     "Content-Type": "application/json",
                     "Accept": "application/json",
-                    "Authorization": `Token ${apiKey}`
+                    "Authorization": `Token ${DADATA_API_KEY}`
                 }
             }
         );
@@ -63,6 +65,73 @@ exports.getSuggestAddress = async (req, res) => {
                 flat : item.data.flat
         }));
 
+        sendResponse(res, 200, { status: true,  data: suggestions });
+        
+    } catch (error) {
+        console.error("Error:", error.message);
+        sendResponse(res, (Number(error) || 500), { code: (Number(error) || 500), message:  new CommonFunctionHelper().getDescriptionByCode((Number(error) || 500)) });
+    }
+};
+
+
+/* Почтовые */
+exports.getRussianPostUnits = async (req, res) => {          
+    const query = req.query.query;
+    // Проверка наличия query
+    if (!query) {
+        return res.status(400).json({
+            status: false,
+            message: "Query parameter is required."
+        });
+    }
+
+    try {
+        const response = await axios.post(
+            DADATA_RUSSIAN_POST_UNIT_URL,
+            { query }, // Тело запроса
+                {
+                    headers: {
+                    "Content-Type": "application/json",
+                    "Accept": "application/json",
+                    "Authorization": `Token ${DADATA_API_KEY}`
+                }
+            }
+        );
+
+        const suggestions = response?.data?.suggestions;
+        sendResponse(res, 200, { status: true,  data: suggestions });
+        
+    } catch (error) {
+        console.error("Error:", error.message);
+        sendResponse(res, (Number(error) || 500), { code: (Number(error) || 500), message:  new CommonFunctionHelper().getDescriptionByCode((Number(error) || 500)) });
+    }
+};
+
+
+exports.getCdekFilials = async (req, res) => {          
+    const query = req.query.query;
+    // Проверка наличия query
+    if (!query) {
+        return res.status(400).json({
+            status: false,
+            message: "Query parameter is required."
+        });
+    }
+
+    try {
+        const response = await axios.post(
+            DADATA_CDEK_DELIVERY_UNIT_URL,
+            { query }, // Тело запроса
+                {
+                    headers: {
+                    "Content-Type": "application/json",
+                    "Accept": "application/json",
+                    "Authorization": `Token ${DADATA_API_KEY}`
+                }
+            }
+        );
+
+        const suggestions = response?.data?.suggestions;
         sendResponse(res, 200, { status: true,  data: suggestions });
         
     } catch (error) {
