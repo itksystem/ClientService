@@ -56,6 +56,8 @@ exports.getSuggestAddress = async (req, res) => {
                 fiasId: item.data.fias_id,
                 fiasLevel: item.data.fias_level,
                 postalCode : item.data.postal_code,
+                latitude : item.data.geo_lat,
+                longitude : item.data.geo_lon,
                 country : item.data.country,
                 region : item.data.region,
                 city : item.data.city,
