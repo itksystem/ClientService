@@ -14,6 +14,7 @@ require('dotenv').config({ path: '.env-client-service' });
 const DADATA_API_KEY = process.env.DADATA_API_KEY || "bc9d9254dea2089592ccee5328f19ce9d004a43c"; // Используем переменные окружения
 const DADATA_SUGGEST_ADDRESS_URL = process.env.DADATA_SUGGEST_ADDRESS_URL || "http://suggestions.dadata.ru/suggestions/api/4_1/rs/suggest/address";
 const DADATA_RUSSIAN_POST_UNIT_URL = process.env.DADATA_RUSSIAN_POST_UNIT_URL || "http://suggestions.dadata.ru/suggestions/api/4_1/rs/suggest/postal_unit";
+const DADATA_RUSSIAN_POST_UNIT_GEOLOCAL_URL = process.env.DADATA_RUSSIAN_POST_UNIT_GEOLOCAL_URL || "http://suggestions.dadata.ru/suggestions/api/4_1/rs/geolocate/postal_unit";
 const DADATA_CDEK_DELIVERY_UNIT_URL = process.env.DADATA_CDEK_DELIVERY_UNIT_URL || "http://suggestions.dadata.ru/suggestions/api/4_1/rs/findById/delivery";
 
 
@@ -79,6 +80,69 @@ exports.getSuggestAddress = async (req, res) => {
 /* Почтовые отделения */
 exports.getRussianPostUnits = async (req, res) => {          
     const query = req.query.query;
+    const lat = req.query.lat;
+    const lon = req.query.lon;
+    const radius_meters = 5000;
+
+    // Проверка наличия query
+    if (!query && (!lon || !lat)) {
+        return res.status(400).json({
+            status: false,
+            message: "Query parameter is required."
+        });
+    }
+
+    try {
+        const response = await axios.post(
+            query
+                ? DADATA_RUSSIAN_POST_UNIT_URL
+                : DADATA_RUSSIAN_POST_UNIT_GEOLOCAL_URL,
+             query 
+                ? { query }
+                : {lat, lon, radius_meters}, // Тело запроса
+                {
+                    headers: {
+                    "Content-Type": "application/json",
+                    "Accept": "application/json",
+                    "Authorization": `Token ${DADATA_API_KEY}`
+                }
+            }
+        );
+
+        const suggestions = response?.data?.suggestions
+        .slice(0, 5) // Ограничиваем вывод 5 элементами
+        .map(item => ({
+                   "value" : item.unrestricted_value,
+                   "postalСode": item.data.postal_code,
+                   "isClosed": item.data.is_closed,
+                   "typeCode": item.data.type_code,
+                   "addressStr": item.data.address_str,
+                   "kladrId": item.data.address_kladr_id,
+                   "qc": item.data.address_qc,
+                   "geoLat": item.data.geo_lat,
+                   "geoLon": item.data.geo_lon,
+                   "schedule" : {
+                   "Mon": item.data.schedule_mon ?? `не работает`,
+                   "Tue": item.data.schedule_tue ?? `не работает`,
+                   "Wed": item.data.schedule_wed ?? `не работает`,
+                   "Thu": item.data.schedule_thu ?? `не работает`,
+                   "Fri": item.data.schedule_fri ?? `не работает`,
+                   "Sat": item.data.schedule_sat ?? `не работает`,
+                   "Sun": item.data.schedule_sun ?? `не работает`
+                   }
+    }));
+        sendResponse(res, 200, { status: true,  data: suggestions })        
+    } catch (error) {
+        console.error("Error:", error.message);
+        sendResponse(res, (Number(error) || 500), { code: (Number(error) || 500), message:  new CommonFunctionHelper().getDescriptionByCode((Number(error) || 500)) });
+    }
+};
+
+
+
+/* Почтовые отделения ближайшие к размещению */
+exports.getRussianPostUnitsViaGeolocal = async (req, res) => {          
+    const query = req.query.query;
     // Проверка наличия query
     if (!query) {
         return res.status(400).json({
@@ -89,7 +153,7 @@ exports.getRussianPostUnits = async (req, res) => {
 
     try {
         const response = await axios.post(
-            DADATA_RUSSIAN_POST_UNIT_URL,
+            DADATA_RUSSIAN_POST_UNIT_GEOLOCAL_URL,
             { query }, // Тело запроса
                 {
                     headers: {
@@ -128,6 +192,7 @@ exports.getRussianPostUnits = async (req, res) => {
         sendResponse(res, (Number(error) || 500), { code: (Number(error) || 500), message:  new CommonFunctionHelper().getDescriptionByCode((Number(error) || 500)) });
     }
 };
+
 
 
 exports.getCdekFilials = async (req, res) => {          
