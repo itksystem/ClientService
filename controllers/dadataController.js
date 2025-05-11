@@ -113,7 +113,7 @@ exports.getRussianPostUnits = async (req, res) => {
         .slice(0, 5) // Ограничиваем вывод 5 элементами
         .map(item => ({
                    "value" : item.unrestricted_value,
-                   "postalСode": item.data.postal_code,
+                   "postalCode": item.data.postal_code,
                    "isClosed": item.data.is_closed,
                    "typeCode": item.data.type_code,
                    "addressStr": item.data.address_str,
@@ -168,7 +168,7 @@ exports.getRussianPostUnitsViaGeolocal = async (req, res) => {
         .slice(0, 5) // Ограничиваем вывод 5 элементами
         .map(item => ({
                    "value" : item.unrestricted_value,
-                   "postalСode": item.data.postal_code,
+                   "postalCode": item.data.postal_code,
                    "isClosed": item.data.is_closed,
                    "typeCode": item.data.type_code,
                    "addressStr": item.data.address_str,
